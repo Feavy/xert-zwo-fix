@@ -1,10 +1,11 @@
 import Interval from "./Interval";
 
 export default class Workout {
-    constructor(data, ftp, title = "Workout") {
+    constructor(data, ftp, title = "Workout", description = "") {
         this.data = data;
-        this.title = title;
         this.ftp = ftp;
+        this.title = title;
+        this.description = description;
         this.intervals = [];
         let currentInterval = new Interval(ftp);
         let lastValue;
@@ -34,7 +35,7 @@ export default class Workout {
         let zwo = `<workout_file>
 <author>Xert</author>
 <name>${this.title}</name>
-<description>Time-trials are hard, and they're even harder if you go out too fast.  Feel the difference between proper and improper pacing in this demonstration workout that's also a great workout on its own.</description>
+<description>${this.description}</description>
 <sportType>bike</sportType>
 <tags><tag name="Xert" /></tags>
 <workout>

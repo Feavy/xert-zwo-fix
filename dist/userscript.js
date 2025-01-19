@@ -9,13 +9,13 @@
 // @grant        none
 // ==/UserScript==
 
-var l = Object.defineProperty;
-var d = (a, t, s) => t in a ? l(a, t, { enumerable: !0, configurable: !0, writable: !0, value: s }) : a[t] = s;
-var u = (a, t, s) => d(a, typeof t != "symbol" ? t + "" : t, s);
-function c(a, t, s, e, n, r) {
-  return Math.abs((n - s) * (e - t) - (s - a) * (r - e)) / Math.sqrt((n - s) ** 2 + (r - e) ** 2);
+var d = Object.defineProperty;
+var f = (a, t, s) => t in a ? d(a, t, { enumerable: !0, configurable: !0, writable: !0, value: s }) : a[t] = s;
+var u = (a, t, s) => f(a, typeof t != "symbol" ? t + "" : t, s);
+function l(a, t, s, e, n, o) {
+  return Math.abs((n - s) * (e - t) - (s - a) * (o - e)) / Math.sqrt((n - s) ** 2 + (o - e) ** 2);
 }
-function f(a) {
+function w(a) {
   const t = Math.floor(a / 60), s = a % 60;
   return `${t}:${s < 10 ? "0" : ""}${s}`;
 }
@@ -32,14 +32,14 @@ const i = class i {
   getFarestPoint() {
     let t = -1, s = null;
     for (const e of this.values) {
-      const n = c(e.seconds, e.watts, this.start, this.startWatts, this.start + this.duration, this.endWatts);
+      const n = l(e.seconds, e.watts, this.start, this.startWatts, this.start + this.duration, this.endWatts);
       n > t && (t = n, s = e);
     }
     return s;
   }
   getMaxDistance() {
     const t = this.getFarestPoint();
-    return c(t.seconds, t.watts, this.start, this.startWatts, this.start + this.duration, this.endWatts);
+    return l(t.seconds, t.watts, this.start, this.startWatts, this.start + this.duration, this.endWatts);
   }
   getMaxSubIntervalLength() {
     const t = this.getFarestPoint(), s = this.values.indexOf(t);
@@ -84,7 +84,7 @@ const i = class i {
     }
   }
   toString() {
-    return `${this.type} @ ${f(this.start)} : ${Math.floor(this.startWatts)}W -> ${Math.floor(this.endWatts)}W in ${this.duration}s`;
+    return `${this.type} @ ${w(this.start)} : ${Math.floor(this.startWatts)}W -> ${Math.floor(this.endWatts)}W in ${this.duration}s`;
   }
   static fromValues(t, s) {
     const e = new i(s);
@@ -94,20 +94,20 @@ const i = class i {
   }
 };
 u(i, "CURVED_THRESHOLD", 3);
-let h = i;
-class w {
-  constructor(t, s, e = "Workout") {
-    this.data = t, this.title = e, this.ftp = s, this.intervals = [];
-    let n = new h(s), r;
-    for (const o of this.data)
-      (typeof this.min > "u" || o.watts < this.min) && (this.min = o.watts), (typeof this.max > "u" || o.watts > this.max) && (this.max = o.watts), typeof r < "u" && Math.abs(o.watts - r.watts) > 10 && (n.close(), this.intervals.push(n), n = new h(s)), n.add(o), r = o;
-    n.close(), this.intervals.push(n);
+let c = i;
+class p {
+  constructor(t, s, e = "Workout", n = "") {
+    this.data = t, this.ftp = s, this.title = e, this.description = n, this.intervals = [];
+    let o = new c(s), h;
+    for (const r of this.data)
+      (typeof this.min > "u" || r.watts < this.min) && (this.min = r.watts), (typeof this.max > "u" || r.watts > this.max) && (this.max = r.watts), typeof h < "u" && Math.abs(r.watts - h.watts) > 10 && (o.close(), this.intervals.push(o), o = new c(s)), o.add(r), h = r;
+    o.close(), this.intervals.push(o);
   }
   toZwo() {
     return `<workout_file>
 <author>Xert</author>
 <name>${this.title}</name>
-<description>Time-trials are hard, and they're even harder if you go out too fast.  Feel the difference between proper and improper pacing in this demonstration workout that's also a great workout on its own.</description>
+<description>${this.description}</description>
 <sportType>bike</sportType>
 <tags><tag name="Xert" /></tags>
 <workout>
@@ -117,7 +117,7 @@ class w {
 </workout_file>`;
   }
 }
-async function p() {
+async function m() {
   const a = document.getElementsByName("_token")[0].value, t = await fetch("/my-fitness", {
     credentials: "same-origin",
     cache: "no-store",
@@ -130,7 +130,7 @@ async function p() {
   return JSON.parse(t.split("trainingAdvice:")[1].split(`,
 `)[0]).signature.ftp.toFixed(0);
 }
-async function m() {
+async function v() {
   const a = window.location.href.split("/workout/")[1].split("/")[0], t = document.getElementsByName("_token")[0].value;
   return await fetch(`/workout/${a}/data`, {
     credentials: "same-origin",
@@ -142,11 +142,11 @@ async function m() {
     }
   }).then((e) => e.json());
 }
-async function v() {
-  const a = await m(), t = await p(), s = WorkoutDetails.$$.ctx[4].name, e = new w(a.data, t, s);
-  g(e.toZwo(), `${s}.zwo`);
+async function g() {
+  const a = await v(), t = await m(), s = WorkoutDetails.$$.ctx[4].name, e = WorkoutDetails.$$.ctx[4].description, n = new p(a.data, t, s, e);
+  W(n.toZwo(), `${s}.zwo`);
 }
-var g = function() {
+var W = function() {
   var a = document.createElement("a");
   return document.body.appendChild(a), a.style = "display: none", function(t, s) {
     var e = new Blob([t], { type: "octet/stream" }), n = window.URL.createObjectURL(e);
@@ -155,5 +155,5 @@ var g = function() {
 }();
 (function() {
   const a = document.getElementsByClassName("btns-row")[0], t = document.createElement("a");
-  t.className = "svelte-9g3kuk", t.innerHTML = '<button class="svelte-9g3kuk"><span class="svelte-9g3kuk"><i class="fa fa-circle-arrow-down svelte-9g3kuk"></i> <p class="svelte-9g3kuk">ZWO (fix)</p></span></button>', a.insertBefore(t, a.childNodes[1]), t.addEventListener("click", v);
+  t.className = "svelte-9g3kuk", t.innerHTML = '<button class="svelte-9g3kuk"><span class="svelte-9g3kuk"><i class="fa fa-circle-arrow-down svelte-9g3kuk"></i> <p class="svelte-9g3kuk">ZWO (fix)</p></span></button>', a.insertBefore(t, a.childNodes[1]), t.addEventListener("click", g);
 })();

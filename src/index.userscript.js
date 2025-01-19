@@ -5,7 +5,8 @@ async function downloadFixedZWO() {
     const workoutData = await fetchWorkoutData();
     const ftp = await fetchFtp();
     const title = WorkoutDetails.$$.ctx[4].name;
-    const workout = new Workout(workoutData.data, ftp, title);
+    const description =  WorkoutDetails.$$.ctx[4].description;
+    const workout = new Workout(workoutData.data, ftp, title, description);
     download(workout.toZwo(), `${title}.zwo`);
 }
 
