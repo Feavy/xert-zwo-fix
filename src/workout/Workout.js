@@ -1,11 +1,12 @@
 import Interval from "./Interval";
 
 export default class Workout {
-    constructor(data, title = "Workout") {
+    constructor(data, ftp, title = "Workout") {
         this.data = data;
         this.title = title;
+        this.ftp = ftp;
         this.intervals = [];
-        let currentInterval = new Interval();
+        let currentInterval = new Interval(ftp);
         let lastValue;
 
         for(const value of this.data) {
@@ -16,10 +17,10 @@ export default class Workout {
                 this.max = value.watts;
             }
 
-            if(typeof(lastValue) !== 'undefined' && Math.abs(value.watts - lastValue.watts) > 50) {
+            if(typeof(lastValue) !== 'undefined' && Math.abs(value.watts - lastValue.watts) > 10) {
                 currentInterval.close();
                 this.intervals.push(currentInterval);
-                currentInterval = new Interval();
+                currentInterval = new Interval(ftp);
             }
             currentInterval.add(value);
 
@@ -29,7 +30,7 @@ export default class Workout {
         this.intervals.push(currentInterval);
     }
 
-    toZwo(ftp) {
+    toZwo() {
         let zwo = `<workout_file>
 <author>Xert</author>
 <name>${this.title}</name>
@@ -37,7 +38,7 @@ export default class Workout {
 <sportType>bike</sportType>
 <tags><tag name="Xert" /></tags>
 <workout>
-        ${this.intervals.map(interval => interval.toZwo(ftp)).join('\n')}
+        ${this.intervals.map(interval => interval.toZwo()).join('\n')}
 </workout>
 </workout_file>`;
         return zwo;

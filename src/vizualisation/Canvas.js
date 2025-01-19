@@ -4,6 +4,7 @@ export default class Canvas {
         this.height = height;
 
         this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        // this.svg.setAttribute('transform', 'scale(3, 3)');
         this.svg.setAttribute('viewBox', `0 0 ${this.width} ${this.height + 50}`);
     }
 
@@ -42,5 +43,13 @@ export default class Canvas {
         this.svg.appendChild(text);
     }
 
+    drawText(x, y, label) {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', x);
+        text.setAttribute('y', this.height - y);
+        text.setAttribute('font-size', 15);
+        text.textContent = label;
+        this.svg.appendChild(text);
+    }
 
 }
